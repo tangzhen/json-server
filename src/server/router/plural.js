@@ -5,6 +5,7 @@ const write = require('./write')
 const getFullURL = require('./get-full-url')
 const utils = require('../utils')
 const delay = require('./delay')
+const config = require('read-pkg-up').sync().pkg['json-server']
 
 module.exports = (db, name, opts) => {
   // Create router
@@ -57,10 +58,10 @@ module.exports = (db, name, opts) => {
     let q = req.query.q
     let _start = req.query._start
     let _end = req.query._end
-    let _page = req.query._page
+    let _page = req.query[_.get(config, 'params._page', '_page')]
     let _sort = req.query._sort
     let _order = req.query._order
-    let _limit = req.query._limit
+    let _limit = req.query[_.get(config, 'params._limit', '_limit')]
     let _embed = req.query._embed
     let _expand = req.query._expand
     delete req.query.q
