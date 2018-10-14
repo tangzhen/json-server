@@ -5,10 +5,11 @@ module.exports = {
     'prettier/prettier': [
       'error',
       {
+        printWidth: 120,
         singleQuote: true,
-        semi: false,
-      },
+        useTabs: false
+      }
     ]
   },
   env: { jest: true }
-}
+};
