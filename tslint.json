@@ -1,0 +1,15 @@
+{
+  "extends": [
+    "tslint:recommended"
+  ],
+  "jsRules": {
+    "no-console": false,
+    "object-literal-sort-keys": false,
+    "no-unused-expression": [true, "allow-fast-null-checks"]
+  },
+  "rules": {
+    "no-console": false,
+    "object-literal-sort-keys": false,
+    "no-unused-expression": [true, "allow-fast-null-checks"]
+  }
+}

@@ -7,7 +7,8 @@ module.exports = {
   module: {
     rules: [
       { test: /\.css$/, use: [MiniCssExtractPlugin.loader, 'css-loader'] },
-      { test: /\.js$/, exclude: /node_modules/, loader: 'babel-loader' }
+      { test: /\.(t|j)s?$/, exclude: [/node_modules/], loader: ['awesome-typescript-loader?module=es6'] },
+      { test: /\.js$/, loader: 'source-map-loader', enforce: 'pre' }
     ]
   },
   plugins: [

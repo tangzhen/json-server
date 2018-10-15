@@ -1,7 +1,7 @@
-const express = require('express');
-const write = require('./write');
-const getFullURL = require('./get-full-url');
-const delay = require('./delay');
+const express = require("express");
+const write = require("./write");
+const getFullURL = require("./get-full-url");
+const delay = require("./delay");
 
 module.exports = (db, name) => {
   const router = express.Router();
@@ -16,7 +16,7 @@ module.exports = (db, name) => {
     db.set(name, req.body).value();
     res.locals.data = db.get(name).value();
 
-    res.setHeader('Access-Control-Expose-Headers', 'Location');
+    res.setHeader("Access-Control-Expose-Headers", "Location");
     res.location(`${getFullURL(req)}`);
 
     res.status(201);
@@ -24,7 +24,7 @@ module.exports = (db, name) => {
   }
 
   function update(req, res, next) {
-    if (req.method === 'PUT') {
+    if (req.method === "PUT") {
       db.set(name, req.body).value();
     } else {
       db.get(name)
@@ -39,7 +39,7 @@ module.exports = (db, name) => {
   const w = write(db);
 
   router
-    .route('/')
+    .route("/")
     .get(show)
     .post(create, w)
     .put(update, w)

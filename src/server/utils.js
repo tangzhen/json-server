@@ -1,5 +1,5 @@
 module.exports = {
-  getPage
+  getPage,
 };
 
 function getPage(array, page, perPage) {

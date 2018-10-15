@@ -1,6 +1,6 @@
-const express = require('express');
-const pluralize = require('pluralize');
-const delay = require('./delay');
+const express = require("express");
+const pluralize = require("pluralize");
+const delay = require("./delay");
 
 module.exports = opts => {
   const router = express.Router();
@@ -22,5 +22,5 @@ module.exports = opts => {
     next();
   }
 
-  return router.get('/:resource/:id/:nested', get).post('/:resource/:id/:nested', post);
+  return router.get("/:resource/:id/:nested", get).post("/:resource/:id/:nested", post);
 };

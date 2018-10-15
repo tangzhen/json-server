@@ -1,11 +1,11 @@
-const express = require('express');
-const _ = require('lodash');
-const pluralize = require('pluralize');
-const write = require('./write');
-const getFullURL = require('./get-full-url');
-const utils = require('../utils');
-const delay = require('./delay');
-const config = require('read-pkg-up').sync().pkg['json-server'];
+const express = require("express");
+const _ = require("lodash");
+const pluralize = require("pluralize");
+const write = require("./write");
+const getFullURL = require("./get-full-url");
+const utils = require("../utils");
+const delay = require("./delay");
+const config = require("read-pkg-up").sync().pkg["json-server"];
 
 module.exports = (db, name, opts) => {
   // Create router
@@ -14,33 +14,31 @@ module.exports = (db, name, opts) => {
 
   // Embed function used in GET /name and GET /name/id
   function embed(resource, e) {
-    e &&
-      [].concat(e).forEach(externalResource => {
-        if (db.get(externalResource).value) {
-          const query = {};
-          const singularResource = pluralize.singular(name);
-          query[`${singularResource}${opts.foreignKeySuffix}`] = resource.id;
-          resource[externalResource] = db
-            .get(externalResource)
-            .filter(query)
-            .value();
-        }
-      });
+    e && [].concat(e).forEach(externalResource => {
+      if (db.get(externalResource).value) {
+        const query = {};
+        const singularResource = pluralize.singular(name);
+        query[`${singularResource}${opts.foreignKeySuffix}`] = resource.id;
+        resource[externalResource] = db
+          .get(externalResource)
+          .filter(query)
+          .value();
+      }
+    });
   }
 
   // Expand function used in GET /name and GET /name/id
   function expand(resource, e) {
-    e &&
-      [].concat(e).forEach(innerResource => {
-        const plural = pluralize(innerResource);
-        if (db.get(plural).value()) {
-          const prop = `${innerResource}${opts.foreignKeySuffix}`;
-          resource[innerResource] = db
-            .get(plural)
-            .getById(resource[prop])
-            .value();
-        }
-      });
+    e && [].concat(e).forEach(innerResource => {
+      const plural = pluralize(innerResource);
+      if (db.get(plural).value()) {
+        const prop = `${innerResource}${opts.foreignKeySuffix}`;
+        resource[innerResource] = db
+          .get(plural)
+          .getById(resource[prop])
+          .value();
+      }
+    });
   }
 
   // GET /name
@@ -58,10 +56,10 @@ module.exports = (db, name, opts) => {
     let q = req.query.q;
     let _start = req.query._start;
     let _end = req.query._end;
-    let _page = req.query[_.get(config, 'params._page', '_page')];
+    let pageParam = req.query[_.get(config, "params._page", "_page")];
     let _sort = req.query._sort;
     let _order = req.query._order;
-    let _limit = req.query[_.get(config, 'params._limit', '_limit')];
+    let limitParam = req.query[_.get(config, "params._limit", "_limit")];
     let _embed = req.query._embed;
     let _expand = req.query._expand;
     delete req.query.q;
@@ -80,14 +78,15 @@ module.exports = (db, name, opts) => {
       for (let i in arr) {
         if (
           _.has(arr[i], query) ||
-          query === 'callback' ||
-          query === '_' ||
+          query === "callback" ||
+          query === "_" ||
           /_lte$/.test(query) ||
           /_gte$/.test(query) ||
           /_ne$/.test(query) ||
           /_like$/.test(query)
-        )
+        ) {
           return;
+        }
       }
       delete req.query[query];
     });
@@ -101,19 +100,14 @@ module.exports = (db, name, opts) => {
       q = q.toLowerCase();
 
       chain = chain.filter(obj => {
-        for (let key in obj) {
-          const value = obj[key];
-          if (db._.deepQuery(value, q)) {
-            return true;
-          }
-        }
+        return _.some(obj, (value) => db._.deepQuery(value, q));
       });
     }
 
     Object.keys(req.query).forEach(key => {
       // Don't take into account JSONP query parameters
       // jQuery adds a '_' query parameter too
-      if (key !== 'callback' && key !== '_') {
+      if (key !== "callback" && key !== "_") {
         // Always use an array, in case req.query is an array
         const arr = [].concat(req.query[key]);
 
@@ -123,7 +117,7 @@ module.exports = (db, name, opts) => {
               const isDifferent = /_ne$/.test(key);
               const isRange = /_lte$/.test(key) || /_gte$/.test(key);
               const isLike = /_like$/.test(key);
-              const path = key.replace(/(_lte|_gte|_ne|_like)$/, '');
+              const path = key.replace(/(_lte|_gte|_ne|_like)$/, "");
               // get item value based on path
               // i.e post.title -> 'foo'
               const elementValue = _.get(element, path);
@@ -140,7 +134,7 @@ module.exports = (db, name, opts) => {
               } else if (isDifferent) {
                 return value !== elementValue.toString();
               } else if (isLike) {
-                return new RegExp(value, 'i').test(elementValue.toString());
+                return new RegExp(value, "i").test(elementValue.toString());
               } else {
                 return value === elementValue.toString();
               }
@@ -152,22 +146,22 @@ module.exports = (db, name, opts) => {
 
     // Sort
     if (_sort) {
-      const _sortSet = _sort.split(',');
-      const _orderSet = (_order || '').split(',').map(s => s.toLowerCase());
-      chain = chain.orderBy(_sortSet, _orderSet);
+      const sortSet = _sort.split(",");
+      const orderSet = (_order || "").split(",").map(s => s.toLowerCase());
+      chain = chain.orderBy(sortSet, orderSet);
     }
 
     // Slice result
-    if (_end || _limit || _page) {
-      res.setHeader('X-Total-Count', chain.size());
-      res.setHeader('Access-Control-Expose-Headers', `X-Total-Count${_page ? ', Link' : ''}`);
+    if (_end || limitParam || pageParam) {
+      res.setHeader("X-Total-Count", chain.size());
+      res.setHeader("Access-Control-Expose-Headers", `X-Total-Count${pageParam ? ", Link" : ""}`);
     }
 
-    if (_page) {
-      _page = parseInt(_page, 10);
-      _page = _page >= 1 ? _page : 1;
-      _limit = parseInt(_limit, 10) || 10;
-      const page = utils.getPage(chain.value(), _page, _limit);
+    if (pageParam) {
+      pageParam = parseInt(pageParam, 10);
+      pageParam = pageParam >= 1 ? pageParam : 1;
+      limitParam = parseInt(limitParam, 10) || 10;
+      const page = utils.getPage(chain.value(), pageParam, limitParam);
       const links = {};
       const fullURL = getFullURL(req);
 
@@ -193,10 +187,10 @@ module.exports = (db, name, opts) => {
       _start = parseInt(_start, 10) || 0;
       _end = parseInt(_end, 10);
       chain = chain.slice(_start, _end);
-    } else if (_limit) {
+    } else if (limitParam) {
       _start = parseInt(_start, 10) || 0;
-      _limit = parseInt(_limit, 10);
-      chain = chain.slice(_start, _start + _limit);
+      limitParam = parseInt(limitParam, 10);
+      chain = chain.slice(_start, _start + limitParam);
     }
 
     // embed and expand
@@ -244,7 +238,7 @@ module.exports = (db, name, opts) => {
       .insert(req.body)
       .value();
 
-    res.setHeader('Access-Control-Expose-Headers', 'Location');
+    res.setHeader("Access-Control-Expose-Headers", "Location");
     res.location(`${getFullURL(req)}/${resource.id}`);
 
     res.status(201);
@@ -259,7 +253,7 @@ module.exports = (db, name, opts) => {
     const id = req.params.id;
     let chain = db.get(name);
 
-    chain = req.method === 'PATCH' ? chain.updateById(id, req.body) : chain.replaceById(id, req.body);
+    chain = req.method === "PATCH" ? chain.updateById(id, req.body) : chain.replaceById(id, req.body);
 
     const resource = chain.value();
 
@@ -295,12 +289,12 @@ module.exports = (db, name, opts) => {
   const w = write(db);
 
   router
-    .route('/')
+    .route("/")
     .get(list)
     .post(create, w);
 
   router
-    .route('/:id')
+    .route("/:id")
     .get(show)
     .put(update, w)
     .patch(update, w)

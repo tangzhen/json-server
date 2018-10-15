@@ -1,13 +1,13 @@
-import 'promise-polyfill/src/polyfill';
-import 'whatwg-fetch';
-import { h, render } from 'preact';
-import 'milligram/dist/milligram.css';
-import './style.css';
+import "promise-polyfill/src/polyfill";
+import "whatwg-fetch";
+import { h, render } from "preact";
+import "milligram/dist/milligram.css";
+import "./style.css";
 
 function ResourceItem({ name, length }) {
   return (
     <li>
-      <a href={name}>/{name}</a> <sup>{length ? `${length}x` : 'object'}</sup>
+      <a href={name}>/{name}</a> <sup>{length ? `${length}x` : "object"}</sup>
     </li>
   );
 }
@@ -36,9 +36,9 @@ function ResourcesBlock({ db }) {
 }
 
 window
-  .fetch('db')
+  .fetch("db")
   .then(response => response.json())
-  .then(db => render(<ResourcesBlock db={db} />, document.getElementById('resources')));
+  .then(db => render(<ResourcesBlock db={db} />, document.getElementById("resources")));
 
 function CustomRoutesBlock({ customRoutes }) {
   const rules = Object.keys(customRoutes);
@@ -60,8 +60,8 @@ function CustomRoutesBlock({ customRoutes }) {
 }
 
 window
-  .fetch('__rules')
+  .fetch("__rules")
   .then(response => response.json())
   .then(customRoutes => {
-    render(<CustomRoutesBlock customRoutes={customRoutes} />, document.getElementById('custom-routes'));
+    render(<CustomRoutesBlock customRoutes={customRoutes} />, document.getElementById("custom-routes"));
   });

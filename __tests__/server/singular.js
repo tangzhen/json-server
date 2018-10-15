@@ -1,7 +1,7 @@
-const request = require('supertest');
-const jsonServer = require('../../src/server');
+const request = require("supertest");
+const jsonServer = require("../../src/server");
 
-describe('Server', () => {
+describe("Server", () => {
   let server;
   let router;
   let db;
@@ -10,8 +10,8 @@ describe('Server', () => {
     db = {};
 
     db.user = {
-      name: 'foo',
-      email: 'foo@example.com'
+      name: "foo",
+      email: "foo@example.com",
     };
 
     server = jsonServer.create();
@@ -20,42 +20,42 @@ describe('Server', () => {
     server.use(router);
   });
 
-  describe('GET /:resource', () => {
-    test('should respond with corresponding resource', () =>
+  describe("GET /:resource", () => {
+    test("should respond with corresponding resource", () =>
       request(server)
-        .get('/user')
+        .get("/user")
         .expect(db.user)
         .expect(200));
   });
 
-  describe('POST /:resource', () => {
-    test('should create resource', () => {
-      const user = { name: 'bar' };
+  describe("POST /:resource", () => {
+    test("should create resource", () => {
+      const user = { name: "bar" };
       return request(server)
-        .post('/user')
+        .post("/user")
         .send(user)
         .expect(user)
         .expect(201);
     });
   });
 
-  describe('PUT /:resource', () => {
-    test('should update resource', () => {
-      const user = { name: 'bar' };
+  describe("PUT /:resource", () => {
+    test("should update resource", () => {
+      const user = { name: "bar" };
       return request(server)
-        .put('/user')
+        .put("/user")
         .send(user)
         .expect(user)
         .expect(200);
     });
   });
 
-  describe('PATCH /:resource', () => {
-    test('should update resource', () =>
+  describe("PATCH /:resource", () => {
+    test("should update resource", () =>
       request(server)
-        .patch('/user')
-        .send({ name: 'bar' })
-        .expect({ name: 'bar', email: 'foo@example.com' })
+        .patch("/user")
+        .send({ name: "bar" })
+        .expect({ name: "bar", email: "foo@example.com" })
         .expect(200));
   });
 });

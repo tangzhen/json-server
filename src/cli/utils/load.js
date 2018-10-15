@@ -1,16 +1,16 @@
-const fs = require('fs');
-const path = require('path');
-const request = require('request');
-const low = require('lowdb');
-const FileAsync = require('lowdb/adapters/FileAsync');
-const Memory = require('lowdb/adapters/Memory');
-const is = require('./is');
-const chalk = require('chalk');
+const fs = require("fs");
+const path = require("path");
+const request = require("request");
+const low = require("lowdb");
+const FileAsync = require("lowdb/adapters/FileAsync");
+const Memory = require("lowdb/adapters/Memory");
+const is = require("./is");
+const chalk = require("chalk");
 
 const example = {
-  posts: [{ id: 1, title: 'json-server', author: 'typicode' }],
-  comments: [{ id: 1, body: 'some comment', postId: 1 }],
-  profile: { name: 'typicode' }
+  comments: [{ id: 1, body: "some comment", postId: 1 }],
+  posts: [{ id: 1, title: "json-server", author: "typicode" }],
+  profile: { name: "typicode" },
 };
 
 module.exports = function(source) {
@@ -27,12 +27,12 @@ module.exports = function(source) {
     } else if (is.URL(source)) {
       // Load remote data
       const opts = {
+        json: true,
         url: source,
-        json: true
       };
 
       request(opts, (err, response) => {
-        if (err) return reject(err);
+        if (err) { return reject(err); }
         resolve(low(new Memory()).setState(response.body));
       });
     } else if (is.JS(source)) {
@@ -41,8 +41,8 @@ module.exports = function(source) {
       delete require.cache[filename];
       const dataFn = require(filename);
 
-      if (typeof dataFn !== 'function') {
-        throw new Error('The database is a JavaScript file but the export is not a function.');
+      if (typeof dataFn !== "function") {
+        throw new Error("The database is a JavaScript file but the export is not a function.");
       }
 
       // Run dataFn to generate data

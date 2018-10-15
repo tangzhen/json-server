@@ -1,10 +1,10 @@
-const nanoid = require('nanoid');
-const pluralize = require('pluralize');
+const nanoid = require("nanoid");
+const pluralize = require("pluralize");
 
 module.exports = {
   getRemovable,
   createId,
-  deepQuery
+  deepQuery,
 };
 
 // Returns document ids that have unsatisfied relations
@@ -18,7 +18,7 @@ function getRemovable(db, opts) {
         if (new RegExp(`${opts.foreignKeySuffix}$`).test(key)) {
           // Remove foreign key suffix and pluralize it
           // Example postId -> posts
-          const refName = pluralize.plural(key.replace(new RegExp(`${opts.foreignKeySuffix}$`), ''));
+          const refName = pluralize.plural(key.replace(new RegExp(`${opts.foreignKeySuffix}$`), ""));
           // Test if table exists
           if (db[refName]) {
             // Test if references is defined in table
